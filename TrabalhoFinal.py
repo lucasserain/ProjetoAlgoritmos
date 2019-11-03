@@ -4,8 +4,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 import time
 import numpy as np
+from tkinter.messagebox import showinfo
 
-VALORES = None
+VALORES = []
 teste = None
 
 class minhaThread(threading.Thread):
@@ -16,27 +17,27 @@ class minhaThread(threading.Thread):
         self.algoritmo = algoritmo
         self.tempo = tempo
     def run(self):
-        if self.algoritmo == 'Bubble Sort':
+        if self.algoritmo == 'BubbleSort':
             bubble_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Insertion Sort':
+        elif self.algoritmo == 'InsertionSort':
             insertion_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Selection Sort':
+        elif self.algoritmo == 'SelectionSort':
             selection_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Merge Sort':
+        elif self.algoritmo == 'MergeSort':
             self.vetor.ordenado = merge_sort(self.vetor.lista,0,len(self.vetor.lista)-1,self.tempo) 
-        elif self.algoritmo == 'Quick Sort':
+        elif self.algoritmo == 'QuickSort':
             start = 0
             end = len(self.vetor.lista) - 1  
             quick_sort(self.vetor, start , end, self.tempo)
-        elif self.algoritmo == 'Heap Sort':
+        elif self.algoritmo == 'HeapSort':
             heap_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Counting Sort':
+        elif self.algoritmo == 'CountingSort':
             counting_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Radix Sort':
+        elif self.algoritmo == 'RadixSort':
             radix_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Gnome Sort':
+        elif self.algoritmo == 'GnomeSort':
             gnome_sort(self.vetor,self.tempo)
-        elif self.algoritmo == 'Pancake Sort':
+        elif self.algoritmo == 'PancakeSort':
             pancake_sort(self.vetor,self.tempo)     
         print(self.algoritmo, "chegou ao fim.")
     
@@ -191,14 +192,13 @@ def counting_sort(vetor,tempo):
     m = max(vetor.lista) + 1
     count = [0] * m
     for a in vetor.lista:
-        time.sleep(tempo)
         count[a] += 1
     i = 0
     for a in range(m):
         for c in range(count[a]):
-            time.sleep(tempo)
             vetor.lista[i] = a
             i += 1
+            time.sleep(tempo)    
     vetor.ordenado = True
     return vetor.lista    
 
@@ -208,7 +208,6 @@ def counting_sort_r(vetor, n, exp, tempo):
     v_Ord = [0] * (n)
     for i in range(n):
         vAux[(int)((vetor.lista[i] / exp) % 10)] += 1
-        time.sleep(tempo)
     for i in range(1, 10):
         vAux[i] += vAux[i - 1]
     for i in range(n - 1, -1, -1):
@@ -216,6 +215,7 @@ def counting_sort_r(vetor, n, exp, tempo):
         vAux[(int)((vetor.lista[i] / exp) % 10)] -= 1
     for i in range(n):
         vetor.lista[i] = v_Ord[i]
+        time.sleep(tempo)
     return vetor.lista
 
 def radix_sort(vetor,tempo):
@@ -302,7 +302,7 @@ class App:
         self.listbox.insert(END, "InsertionSort")
         self.listbox.insert(END, "QuickSort")
         self.listbox.insert(END, "RadixSort")
-        self.listbox.insert(END, "SelectSort")
+        self.listbox.insert(END, "SelectionSort")
         self.selection = self.listbox.curselection()
 
     def callback(self, a):
@@ -322,14 +322,16 @@ class App:
 def tela_simulacao():
     global janela
     teste.passaParam()
+    if len(VALORES) != 2:
+        showinfo("Você não selecionou dois algoritmos.", "Selecione dois algoritmos e continue.")
+        return
     # App(janela).passaParam()
     janela.destroy()
     janela = Tk()
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
-    label = Label(janela, text='Simulação aqui!!!')
-    label.pack()
-
-    janela.geometry("600x600+250+50")
+    janela.configure(background='black')
+    
+    janela.geometry("800x800+250+50")
     # 2 - Recebe as Entradas do usuário
     n = 100  # Entrada do usuário - número de elementos
     tempo = 0.1  # Entrada do usuário - tempo de atraso para exibição da animação
@@ -347,15 +349,18 @@ def tela_simulacao():
     while (i < algoritmosUsados):
         listaProv = lista.copy()
         Vetores.append(vetor(listaProv))
-        Figuras.append(Figure(dpi=50, facecolor='#105F10', linewidth=1.0))
+        Figuras.append(Figure(dpi=80, facecolor='#000000', linewidth=1.0))
         Figuras[i].add_subplot(111).plot(Vetores[i].lista)
         i = i + 1
 
     # 5 - Cria Canvas para os algoritmos
+    labelA = Label(janela, text=VALORES[0])
+    labelA.pack()
     canvas = FigureCanvasTkAgg(Figuras[0], master=janela)
     canvas.draw()
     canvas.get_tk_widget().pack()
-
+    labelB = Label(janela, text=VALORES[1])
+    labelB.pack()
     canvasB = FigureCanvasTkAgg(Figuras[1], master=janela)
     canvasB.draw()
     canvasB.get_tk_widget().pack()
@@ -363,7 +368,7 @@ def tela_simulacao():
     # Enquanto o vetor estiver desordenado, atualiza
     start = False
     while (Vetores[0].ordenado == False or Vetores[1].ordenado == False):
-
+        
         Figuras[0].clear()
         Figuras[0].add_subplot(111).plot(Vetores[0].lista)
         canvas.draw()
@@ -393,13 +398,12 @@ def tela_simulacao():
     Figuras[1].add_subplot(111).plot(Vetores[1].lista)
     canvasB.draw()
     Figuras[1].canvas.flush_events()
-
+    
     # Indica que o processamento foi finalizado
     print("Processamento finalizado")
-    menu_bt = Button(janela, text='Voltar/Menur', command=tchauQuerida)
-    janela.configure(background='black')
+    menu_bt = Button(janela, text='Voltar/Menu Pricipal', command=tchauQuerida)
     menu_bt.pack()
-
+    janela.mainloop()
 
 # 1 - Cria tela
 def menu():
@@ -413,10 +417,12 @@ def menu():
     menu_bt_simular.place(x=400, y=180)
     global teste
     teste = App(janela)
-    janela.geometry("600x600+250+50")
+    janela.geometry("600x300+250+50")
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
     janela.configure(background='black')
     janela.mainloop()
+        
+
 
 def tchauQuerida():
     janela.destroy()
@@ -425,7 +431,3 @@ def tchauQuerida():
 
 if __name__ == '__main__':
     menu()
-
-
-
-
