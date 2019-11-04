@@ -306,9 +306,9 @@ class vetor:
 class App:
     def __init__(self, janela):
         self.janela = janela
-        self.listbox = Listbox(self.janela, selectmode=MULTIPLE, width=15)
+        self.listbox = Listbox(self.janela, selectmode=MULTIPLE, width=13)
         self.listbox.pack()
-        self.listbox.place(x=250, y=120)
+        self.listbox.place(x=215, y=150)
         self.listbox.bind("<<ListboxSelect>>", self.callback)
         self.listbox.insert(END, "BubbleSort")
         self.listbox.insert(END, "InsertionSort")
@@ -338,7 +338,6 @@ class App:
 def tela_simulacao():
     global janela
     teste.passaParam()
-    teste2.passaParamm()
     if len(VALORES) != 2:
         showinfo("Erro no número de Algoritmos Selecionados!", "Escolha 2 Algoritmos para comparação.")
         return
@@ -354,7 +353,7 @@ def tela_simulacao():
     
     # 2 - Recebe as Entradas do usuário
     n = int(varN.get())  # Entrada do usuário - número de elementos
-    tempo = TEMPO_ENTRADA  # Entrada do usuário - tempo de atraso para exibição da animação
+    tempo = 0.1 #TEMPO_ENTRADA  # Entrada do usuário - tempo de atraso para exibição da animação
     AlgoritmoA = VALORES[0]  # Algoritmo usada para comparação
     AlgoritmoB = VALORES[1]  # #Algoritmo usada para comparação
     
@@ -469,30 +468,27 @@ def menu():
     janela = Tk()
     label = Label(janela, text='ANÁLISE E COMPLEXIDADE DE ALGORITMOS')
     label.pack()
-    label.place(x=130, y=80)
-    label2 = Label(janela, text='Selecione dois algoritmos e a velocidade desejada para iniciar a simulação')
-    label2.place(x=130, y=80)
+    label.place(x=132, y=5)
+    label2 = Label(janela, text='Selecione dois algoritmos')
+    label2.place(x=185, y=120)
+    label3 = Label(janela, text='Selecione a velocidade da animação')
+    label3.place(x=160, y=325)
     # Botão de simulação
     menu_bt_simular = Button(janela, text='Simular', command=tela_simulacao)
-    menu_bt_simular.place(x=270, y=300)
+    menu_bt_simular.place(x=230, y=450)
     # Label de numero elementos
-    labelIn = Label(janela, text='Insira o número de elementos:')
-    labelIn.place(x=150, y=50)
+    labelIn = Label(janela, text='Insira o número de elementos')
+    labelIn.place(x=170, y=50)
     # Input de elementos
     global varN
     varN = StringVar()
-    inputN = Entry(janela, textvariable=varN, width=5)
+    inputN = Entry(janela, textvariable=varN, width=13)
     inputN.pack()
     varN.set(50)
-    inputN.place(x=320,y=50)
+    inputN.place(x=215,y=85)
     global teste 
     teste = App(janela)
-    v = IntVar()
-    '''
-    Radiobutton(janela, text="Rápido", padx = 20, variable=v,value=1).pack(anchor=W)
-    Radiobutton(janela, text="Atraso Médio", padx = 20, variable=v,value=2).pack(anchor=W)
-    Radiobutton(janela, text="Tempo Real", padx = 20, variable=v,value=3).pack(anchor=W)
-    '''
+   
     janela.geometry("500x500+250+50")
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
     janela.configure(background='black')
