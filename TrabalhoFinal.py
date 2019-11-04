@@ -10,16 +10,18 @@ VALORES = []
 teste = None
 tempoDeExecucao = 0
 
+# Classe para criação de Threads
 class minhaThread(threading.Thread):
     def __init__(self, threadID, vetor, algoritmo, tempo):
         threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.vetor = vetor
-        self.algoritmo = algoritmo
-        self.tempo = tempo
-        self.kill = threading.Event()
+        self.threadID = threadID # Id da thread criada
+        self.vetor = vetor # lista desordenada
+        self.algoritmo = algoritmo # Algoritmo que deve ser utilizado para ordenação
+        self.tempo = tempo # Tempo de atraso - utilizado por conta da parte gráfica
+        self.kill = threading.Event() # Método usado para matar a thread ao fim da execução
     def run(self):
         inicio = time.time()
+        # Aqui, selecionamos o algoritmo que terá a HONRA de ordernar nosso vetor
         if self.algoritmo == 'BubbleSort':
             bubble_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'InsertionSort':
@@ -41,12 +43,16 @@ class minhaThread(threading.Thread):
         elif self.algoritmo == 'GnomeSort':
             gnome_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'PancakeSort':
-            pancake_sort(self.vetor,self.tempo,inicio)     
+            pancake_sort(self.vetor,self.tempo,inicio)    
+        # Aqui calculamos o tempo final gasto pelo algoritmo    
         fim = time.time() 
         self.vetor.tempoAni = fim - inicio
+        # Para calcularmos o tempo de execução, retiramos o tempo levado pelos time.sleep
         self.vetor.tempoExe = self.vetor.tempoAni - (self.vetor.qnt_sleep * self.tempo)
+        # Indicamos que o algoritmo terminou no prompt de comando.
         print(self.algoritmo, "chegou ao fim.")
         self.vetor.ordenado = True
+        # Chama função que "mata" a thread
         self.stop()
         
     def stop(self):
@@ -323,20 +329,19 @@ def pancake_sort(vetor, tempo,inicio):
         curr_size -= 1
     return vetor.lista    
 
-''' ----------------------> CLASSE VETOR <---------------------  '''    
+# Classe vetor, utilizada por todos os algoritmos
 class vetor:
     def __init__(self, lista):
-        self.lista = lista
-        self.ordenado = False
-        self.qnt_sleep = 0
-        self.tempoExe = 0
-        self.tempoAni = 0
+        self.lista = lista # Lista com os elementos não ordenados
+        self.ordenado = False # Flag indicando se o algoritmo terminou de ordenar
+        self.qnt_sleep = 0 # Quantidade de vezes que o algoritmo passou por um time.sleep
+        self.tempoExe = 0 # Tempo total de execução do algoritmo, desconsiderando o tempo de pausa
+        self.tempoAni = 0 # O Tempo total gasto pela animação, considerando o tempo de pausa
 
     def __str__(self):
         return self.nome
    
-''' ----------------------> MAIN <---------------------  '''
-# Listbox das opções de algoritmos
+# Listbox das opções de algoritmos existentes
 class App:
     def __init__(self, janela):
         self.janela = janela
@@ -368,33 +373,41 @@ class App:
         VALORES = [self.listbox.get(idx) for idx in self.listbox.curselection()]
         print(VALORES)
 
-# x - tela de simulação dos algoritmos
+# -----------------> TELA DE SIMULAÇÃO DOS ALGORITMOS
 def tela_simulacao():
+    # Recebe os parametros da tela principal
     global janela
     teste.passaParam()
+    
+    # Tratamento de possiveis erros de entrada do usuário
     if len(VALORES) != 2:
         showinfo("Erro no número de Algoritmos Selecionados!", "Escolha 2 Algoritmos para comparação.")
         return
     if int(varN.get()) <= 1:
         showinfo("Erro no tamanho do vetor inserido!", "Você escolheu um valor de n menor ou igual a 1 (vetor ordenado).")
         return
+    
+    # Fecha Tela Principal
     janela.destroy()
+    
+    # Configura nova Tela
     janela = Tk()
     janela.configure(background='black')
     janela.attributes('-fullscreen',True)
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
     janela.geometry("600x600+250+50")
     
-    # 2 - Recebe as Entradas do usuário
+    # Recebe as Entradas do usuário
     n = int(varN.get())  # Entrada do usuário - número de elementos
-    tempo = tempoDeExecucao #TEMPO_ENTRADA  # Entrada do usuário - tempo de atraso para exibição da animação
+    tempo = tempoDeExecucao # Entrada do usuário - tempo de atraso para exibição da animação
     AlgoritmoA = VALORES[0]  # Algoritmo usada para comparação
     AlgoritmoB = VALORES[1]  # #Algoritmo usada para comparação
-    print(tempoDeExecucao)
-    # 3 - Cria lista de elementos inicial
+    
+    # Cria vetor inicial - fixamos em 10.000 para não haver vetores com valores estratosféricos
     lista = np.random.randint(10000, size=n)
-    algoritmosUsados = 2  # Indica quantos algoritmos foram implementados
-    # 4 - Cria uma cópia da lista para cada algoritmo utilizado
+    algoritmosUsados = 2  # Permitiria (no futuro) a comparação de mais de um algoritmo
+    
+    # Cria uma cópia da lista para cada algoritmo simulado
     i = 0
     Vetores = []
     Figuras = []
@@ -405,11 +418,10 @@ def tela_simulacao():
         Figuras[i].add_subplot(111).plot(Vetores[i].lista)
         i = i + 1
         
-    # Labels de Tempo
+    # Labels de Tempo - Parte Visual
     labelTempoA = Label(janela, text='Tempo de Animação (seg): ')
     labelTempoA.pack()
     labelTempoA.place(x=50, y=100)
-    
     labelTempoA2 = Label(janela, text='Tempo de Execução (seg): ')
     labelTempoA2.pack()
     labelTempoA2.place(x=50, y=200)
@@ -417,12 +429,11 @@ def tela_simulacao():
     labelTempoB = Label(janela, text='Tempo de Animação (seg): ')
     labelTempoB.pack()
     labelTempoB.place(x=50, y=400)
-    
     labelTempoB2 = Label(janela, text='Tempo de Execução (seg): ')
     labelTempoB2.pack()
     labelTempoB2.place(x=50, y=500)
     
-    # 5 - Cria Canvas para os algoritmos
+    # Adiciona os gráficos de cada algoritmo na tela - Parte Visual
     labelA = Label(janela, text=VALORES[0])
     labelA.pack()
     canvas = FigureCanvasTkAgg(Figuras[0], master=janela)
@@ -435,11 +446,10 @@ def tela_simulacao():
     canvasB.draw()
     canvasB.get_tk_widget().pack()
 
-    # Exibe tempo de execução e animação
+    # Exibe tempo de execução e animação - Parte Visual
     labelTempoA_ = Label(janela, text=Vetores[0].tempoAni)
     labelTempoA_.pack()
     labelTempoA_.place(x=50, y=150)
-    
     labelTempoA__ = Label(janela, text=Vetores[0].tempoExe)
     labelTempoA__.pack()
     labelTempoA__.place(x=50, y=250)
@@ -447,78 +457,70 @@ def tela_simulacao():
     labelTempoB_ = Label(janela, text=Vetores[1].tempoAni)
     labelTempoB_.pack()
     labelTempoB_.place(x=50, y=450)
-    
     labelTempoB__ = Label(janela, text=Vetores[1].tempoExe)
     labelTempoB__.pack()
     labelTempoB__.place(x=50, y=550)
     
+    # Botão de retorno do Menu Principal
     menu_bt = Button(janela, text='Voltar/Menu Principal', command=tchauQuerida)
     menu_bt.pack()
-    # Enquanto o vetor estiver desordenado, atualiza
+    
+    # Laço que permanece True enquanto houver vetores desordenados
     start = False
     while (Vetores[0].ordenado == False or Vetores[1].ordenado == False):
-        
+        # Atualiza o tempo de execução na tela
         labelTempoA_.configure(text=Vetores[0].tempoAni)
         labelTempoA__.configure(text=Vetores[0].tempoExe)
         labelTempoB_.configure(text=Vetores[1].tempoAni)
         labelTempoB__.configure(text=Vetores[1].tempoExe)
         
+        # Atualiza o gráfico na tela
         Figuras[0].clear()
         Figuras[0].add_subplot(111).plot(Vetores[0].lista)
         canvas.draw()
         Figuras[0].canvas.flush_events()
-
         Figuras[1].clear()
         Figuras[1].add_subplot(111).plot(Vetores[1].lista)
         canvasB.draw()
         Figuras[1].canvas.flush_events()
-        # Chama thread's para rodar simultanêamente
+        
+        # Cria cada algoritmo em uma thread para rodar simultanêamente
         if start == False:
-            time.sleep(1)
             start = True
             thread = minhaThread(0, Vetores[0], AlgoritmoA, tempo)
             thread.start()
             threadb = minhaThread(0, Vetores[1], AlgoritmoB, tempo)
             threadb.start()
             
-
-    
-    # Atualiza uma última vez
+    # Atualiza o gráfico com o resultado final
     time.sleep(1)        
     Figuras[0].clear()
     Figuras[0].add_subplot(111).plot(Vetores[0].lista)
     canvas.draw()
     Figuras[0].canvas.flush_events()
-
     Figuras[1].clear()
     Figuras[1].add_subplot(111).plot(Vetores[1].lista)
     canvasB.draw()
     Figuras[1].canvas.flush_events()            
     
+    # Atualiza o tempo com o resultado final
     labelTempoA_.configure(text=Vetores[0].tempoAni)
     labelTempoA__.configure(text=Vetores[0].tempoExe)
     labelTempoB_.configure(text=Vetores[1].tempoAni)
     labelTempoB__.configure(text=Vetores[1].tempoExe)
     
-    # Indica que o processamento foi finalizado
+    # Indica no prompt que o processamento foi finalizado
     print("Processamento finalizado")
 
-# 1 - Cria tela
+# -----------------> FUNÇÃO PRINCIPAL
 def menu():
-    # Janela Principal
+    # Cria a Janela Principal
     global janela
     janela = Tk()
     label = Label(janela, text='ANÁLISE E COMPLEXIDADE DE ALGORITMOS')
     label.pack()
-    label.place(x=132, y=5)
-    label2 = Label(janela, text='Selecione dois algoritmos')
-    label2.place(x=185, y=120)
-    label3 = Label(janela, text='Selecione a velocidade da animação')
-    label3.place(x=160, y=325)
-    # Botão de simulação
-    menu_bt_simular = Button(janela, text='Simular', command=tela_simulacao)
-    menu_bt_simular.place(x=230, y=390)
-    # Label de numero elementos
+    
+    # Label de número elementos
     labelIn = Label(janela, text='Insira o número de elementos')
     labelIn.place(x=170, y=50)
     
@@ -529,24 +531,30 @@ def menu():
     inputN.pack()
     varN.set(50)
     inputN.place(x=215,y=85)
+    
+    # Input de Algoritmos Utilizados
+    label.place(x=132, y=5)
+    label2 = Label(janela, text='Selecione dois algoritmos')
+    label2.place(x=185, y=120)
+    
+    # Input de Velocidade
+    label3 = Label(janela, text='Selecione a velocidade da animação')
+    label3.place(x=160, y=325)
     global teste 
     teste = App(janela)
     
+    # Seleção de Velocidade 
     def radCall():
+        global tempoDeExecucao
         radSel = radVar.get()
         if radSel == 1:
             print("selecionei 1")
-            global tempoDeExecucao
-            tempoDeExecucacao = 0
+            tempoDeExecucao = 0
         elif radSel == 2:
-            global tempoDeExecucao
-            tempoDeExecucacao = 0.2
+            tempoDeExecucao = 0.2
         elif radSel == 3:
-            global tempoDeExecucao
-            tempoDeExecucacao = 1
-
+            tempoDeExecucao = 1
     radVar = IntVar()
-    
     rad1 = Radiobutton(janela, text='Tempo Real', variable=radVar, value=1, command=radCall)
     rad2 = Radiobutton(janela, text='Atraso Curto', variable=radVar, value=2, command=radCall)
     rad3 = Radiobutton(janela, text='Atraso Longo', variable=radVar, value=3, command=radCall)
@@ -555,15 +563,20 @@ def menu():
     rad3.place(x=310, y=355)
     rad1.select()
     
+    # Botão de simulação
+    menu_bt_simular = Button(janela, text='Simular', command=tela_simulacao)
+    menu_bt_simular.place(x=230, y=390)
+    
+    # Configuração da Janela
     janela.geometry("500x435+250+50")
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
     janela.configure(background='black')
     janela.mainloop()
 
+# -----------------> FUNÇÃO QUE VOLTA PARA A TELA PRINCIPAL
 def tchauQuerida():
     janela.destroy()
     menu()
-
-
+    
 if __name__ == '__main__':
     menu()
