@@ -509,6 +509,17 @@ def tela_simulacao():
     labelTempoB_.configure(text=Vetores[1].tempoAni)
     labelTempoB__.configure(text=Vetores[1].tempoExe)
     
+    # Indica na tela qual "venceu"
+    if Vetores[0].tempoExe < Vetores[1].tempoExe:
+        vencedor = VALORES[0] + ' teve um menor tempo de execução!'
+    elif Vetores[0].tempoExe > Vetores[1].tempoExe:
+        vencedor = VALORES[1] + ' teve um menor tempo de execução!'
+    elif Vetores[0].tempoExe == Vetores[1].tempoExe:
+        vencedor = 'Empate técnico em tempo de execução!'
+    labelVencedor = Label(janela, text=vencedor)
+    labelVencedor.pack()
+    labelVencedor.place(x=50, y=600)
+        
     # Indica no prompt que o processamento foi finalizado
     print("Processamento finalizado")
 
@@ -529,7 +540,7 @@ def menu():
     varN = StringVar()
     inputN = Entry(janela, textvariable=varN, width=13, justify=CENTER)
     inputN.pack()
-    varN.set(50)
+    varN.set(1000)
     inputN.place(x=215,y=85)
     
     # Input de Algoritmos Utilizados
