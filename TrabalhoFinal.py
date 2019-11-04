@@ -8,6 +8,7 @@ from tkinter.messagebox import showinfo
 
 VALORES = []
 teste = None
+tempoDeExecucao = 0
 
 class minhaThread(threading.Thread):
     def __init__(self, threadID, vetor, algoritmo, tempo):
@@ -20,27 +21,27 @@ class minhaThread(threading.Thread):
     def run(self):
         inicio = time.time()
         if self.algoritmo == 'BubbleSort':
-            bubble_sort(self.vetor,self.tempo)
+            bubble_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'InsertionSort':
-            insertion_sort(self.vetor,self.tempo)
+            insertion_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'SelectionSort':
-            selection_sort(self.vetor,self.tempo)
+            selection_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'MergeSort':
-            self.vetor.ordenado = merge_sort(self.vetor,0,len(self.vetor.lista)-1,self.tempo) 
+            self.vetor.ordenado = merge_sort(self.vetor,0,len(self.vetor.lista)-1,self.tempo,inicio) 
         elif self.algoritmo == 'QuickSort':
             start = 0
             end = len(self.vetor.lista) - 1  
-            quick_sort(self.vetor, start , end, self.tempo)
+            quick_sort(self.vetor, start , end, self.tempo,inicio)
         elif self.algoritmo == 'HeapSort':
-            heap_sort(self.vetor,self.tempo)
+            heap_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'CountingSort':
-            counting_sort(self.vetor,self.tempo)
+            counting_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'RadixSort':
-            radix_sort(self.vetor,self.tempo)
+            radix_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'GnomeSort':
-            gnome_sort(self.vetor,self.tempo)
+            gnome_sort(self.vetor,self.tempo,inicio)
         elif self.algoritmo == 'PancakeSort':
-            pancake_sort(self.vetor,self.tempo)     
+            pancake_sort(self.vetor,self.tempo,inicio)     
         fim = time.time() 
         self.vetor.tempoAni = fim - inicio
         self.vetor.tempoExe = self.vetor.tempoAni - (self.vetor.qnt_sleep * self.tempo)
@@ -54,7 +55,7 @@ class minhaThread(threading.Thread):
         self.kill.set()
         
 ''' ----------------------> BUBBLE SORT <---------------------  '''
-def bubble_sort(vetor,tempo):
+def bubble_sort(vetor,tempo,inicio):
     elementos = len(vetor.lista)-1
     vetor.ordenado = False
     ordenado = False
@@ -67,10 +68,13 @@ def bubble_sort(vetor,tempo):
                 ordenado = False
             time.sleep(tempo/2)
             vetor.qnt_sleep+= 0.5
+            fim = time.time() 
+            vetor.tempoAni = fim - inicio
+            vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista   
 
 ''' ----------------------> INSERTION SORT <---------------------  '''
-def insertion_sort(vetor,tempo):
+def insertion_sort(vetor,tempo,inicio):
     vetor.ordenado = False
     for i in range(1, len(vetor.lista)):
         key = vetor.lista[i]
@@ -81,10 +85,13 @@ def insertion_sort(vetor,tempo):
         vetor.lista[j + 1] = key
         time.sleep(tempo)
         vetor.qnt_sleep+= 1 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista 
 
 ''' ----------------------> SELECTION SORT <---------------------  '''
-def selection_sort(vetor,tempo):
+def selection_sort(vetor,tempo,inicio):
     vetor.ordenado = False
     for i in range(len(vetor.lista)):
         min_idx = i
@@ -94,12 +101,18 @@ def selection_sort(vetor,tempo):
         vetor.lista[i], vetor.lista[min_idx] = vetor.lista[min_idx], vetor.lista[i]  
         time.sleep(tempo)
         vetor.qnt_sleep+= 1 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista
 
 ''' ----------------------> MERGE SORT <---------------------  '''
-def merge(arr, l, m, r, tempo): 
+def merge(arr, l, m, r, tempo,inicio): 
     time.sleep(tempo)
     arr.qnt_sleep+= 1 
+    fim = time.time() 
+    arr.tempoAni = fim - inicio
+    arr.tempoExe = arr.tempoAni - (arr.qnt_sleep * tempo)
     n1 = m - l + 1
     n2 = r- m 
     L = [0] * (n1) 
@@ -128,17 +141,17 @@ def merge(arr, l, m, r, tempo):
         j += 1
         k += 1
 
-def merge_sort(arr,l,r,tempo): 
+def merge_sort(arr,l,r,tempo,inicio): 
     if l < r: 
         m = (l+(r-1))//2
-        merge_sort(arr, l, m, tempo) 
-        merge_sort(arr, m+1, r, tempo) 
-        merge(arr, l, m, r, tempo)     
+        merge_sort(arr, l, m, tempo,inicio) 
+        merge_sort(arr, m+1, r, tempo,inicio) 
+        merge(arr, l, m, r, tempo,inicio)     
     return True
 
 ''' ----------------------> QUICK SORT <---------------------  '''
 
-def partition(vetor, start, end, tempo):
+def partition(vetor, start, end, tempo,inicio):
     pivot = vetor.lista[np.random.randint(start, end)]
     bottom = start - 1
     top = end
@@ -162,20 +175,23 @@ def partition(vetor, start, end, tempo):
                 break
     time.sleep(tempo)
     vetor.qnt_sleep+= 1 
+    fim = time.time() 
+    vetor.tempoAni = fim - inicio
+    vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     vetor.lista[top] = pivot
     return top
 
-def quick_sort(vetor, start, end, tempo):
+def quick_sort(vetor, start, end, tempo,inicio):
     vetor.ordenado = False
     if start < end:
-        split = partition(vetor, start, end, tempo)
-        quick_sort(vetor, start, split - 1, tempo)
-        quick_sort(vetor, split + 1, end, tempo)
+        split = partition(vetor, start, end, tempo, inicio)
+        quick_sort(vetor, start, split - 1, tempo, inicio)
+        quick_sort(vetor, split + 1, end, tempo, inicio)
     else:
         return vetor.lista
     
 ''' ----------------------> HEAP SORT <---------------------  '''
-def heapify(arr, n, i):
+def heapify(arr, n, i,inicio):
     largest = i  
     l = 2 * i + 1
     r = 2 * i + 2  
@@ -185,24 +201,30 @@ def heapify(arr, n, i):
         largest = r
     if largest != i:
         arr[i], arr[largest] = arr[largest], arr[i]  
-        heapify(arr, n, largest)
+        heapify(arr, n, largest, inicio)
         
-def heap_sort(vetor,tempo):
+def heap_sort(vetor,tempo,inicio):
     vetor.ordenado = False
     n = len(vetor.lista)
     for i in range(n, -1, -1):
-        heapify(vetor.lista, n, i)
+        heapify(vetor.lista, n, i,inicio)
         time.sleep(tempo/2)
         vetor.qnt_sleep+= 0.5 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     for i in range(n - 1, 0, -1):
         vetor.lista[i], vetor.lista[0] = vetor.lista[0], vetor.lista[i]  
-        heapify(vetor.lista, i, 0)
+        heapify(vetor.lista, i, 0, inicio)
         time.sleep(tempo/2)
         vetor.qnt_sleep+= 0.5 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista
 
 ''' ----------------------> COUNTING SORT <---------------------  '''
-def counting_sort(vetor,tempo):
+def counting_sort(vetor,tempo,inicio):
     vetor.ordenado = False
     m = max(vetor.lista) + 1
     count = [0] * m
@@ -215,10 +237,13 @@ def counting_sort(vetor,tempo):
             i += 1
         time.sleep(tempo)  
         vetor.qnt_sleep+= 1 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista    
 
 ''' ----------------------> RADIX SORT <---------------------  '''
-def counting_sort_r(vetor, n, exp, tempo):
+def counting_sort_r(vetor, n, exp, tempo,inicio):
     vAux = [0] * 10
     v_Ord = [0] * (n)
     for i in range(n):
@@ -232,31 +257,37 @@ def counting_sort_r(vetor, n, exp, tempo):
         vetor.lista[i] = v_Ord[i]
         time.sleep(tempo)
         vetor.qnt_sleep+= 1 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista
 
-def radix_sort(vetor,tempo):
+def radix_sort(vetor,tempo,inicio):
     vetor.ordenado = False
     m = max(vetor.lista)
     n = len(vetor.lista)
     exp = 1
     while m >= exp :
-        counting_sort_r(vetor, n, exp, tempo)
+        counting_sort_r(vetor, n, exp, tempo,inicio)
         exp *= 10  
     return vetor.lista
     
 ''' ----------------------> GNOME SORT <---------------------  '''
-def gnome_sort(vetor, tempo):
+def gnome_sort(vetor, tempo,inicio):
     index = 0
     while index < len(vetor.lista):
-        time.sleep(tempo)
-        vetor.qnt_sleep+= 1 
         if index == 0:
             index = index + 1
         if vetor.lista[index] >= vetor.lista[index - 1]:
             index = index + 1
         else:
             vetor.lista[index], vetor.lista[index - 1] = vetor.lista[index - 1], vetor.lista[index]
-            index = index - 1  
+            index = index - 1 
+            time.sleep(tempo)
+            vetor.qnt_sleep+= 1 
+            fim = time.time() 
+            vetor.tempoAni = fim - inicio
+            vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
     return vetor.lista
 
 ''' ----------------------> PANCAKE SORT <---------------------  '''
@@ -276,12 +307,15 @@ def findMax(arr, n, tempo):
             mi = i 
     return mi 
   
-def pancake_sort(vetor, tempo): 
+def pancake_sort(vetor, tempo,inicio): 
     n = len(vetor.lista)
     curr_size = n 
     while curr_size > 1: 
         time.sleep(tempo)
         vetor.qnt_sleep+= 1 
+        fim = time.time() 
+        vetor.tempoAni = fim - inicio
+        vetor.tempoExe = vetor.tempoAni - (vetor.qnt_sleep * tempo)
         mi = findMax(vetor.lista, curr_size, tempo) 
         if mi != curr_size-1: 
             flip(vetor.lista, mi, tempo) 
@@ -306,7 +340,7 @@ class vetor:
 class App:
     def __init__(self, janela):
         self.janela = janela
-        self.listbox = Listbox(self.janela, selectmode=MULTIPLE, width=13)
+        self.listbox = Listbox(self.janela, selectmode=MULTIPLE, width=13, justify=CENTER)
         self.listbox.pack()
         self.listbox.place(x=215, y=150)
         self.listbox.bind("<<ListboxSelect>>", self.callback)
@@ -333,7 +367,7 @@ class App:
         global VALORES
         VALORES = [self.listbox.get(idx) for idx in self.listbox.curselection()]
         print(VALORES)
-        
+
 # x - tela de simulação dos algoritmos
 def tela_simulacao():
     global janela
@@ -353,14 +387,13 @@ def tela_simulacao():
     
     # 2 - Recebe as Entradas do usuário
     n = int(varN.get())  # Entrada do usuário - número de elementos
-    tempo = 0.1 #TEMPO_ENTRADA  # Entrada do usuário - tempo de atraso para exibição da animação
+    tempo = tempoDeExecucao #TEMPO_ENTRADA  # Entrada do usuário - tempo de atraso para exibição da animação
     AlgoritmoA = VALORES[0]  # Algoritmo usada para comparação
     AlgoritmoB = VALORES[1]  # #Algoritmo usada para comparação
-    
+    print(tempoDeExecucao)
     # 3 - Cria lista de elementos inicial
     lista = np.random.randint(10000, size=n)
     algoritmosUsados = 2  # Indica quantos algoritmos foram implementados
-
     # 4 - Cria uma cópia da lista para cada algoritmo utilizado
     i = 0
     Vetores = []
@@ -402,13 +435,33 @@ def tela_simulacao():
     canvasB.draw()
     canvasB.get_tk_widget().pack()
 
+    # Exibe tempo de execução e animação
+    labelTempoA_ = Label(janela, text=Vetores[0].tempoAni)
+    labelTempoA_.pack()
+    labelTempoA_.place(x=50, y=150)
     
+    labelTempoA__ = Label(janela, text=Vetores[0].tempoExe)
+    labelTempoA__.pack()
+    labelTempoA__.place(x=50, y=250)
+    
+    labelTempoB_ = Label(janela, text=Vetores[1].tempoAni)
+    labelTempoB_.pack()
+    labelTempoB_.place(x=50, y=450)
+    
+    labelTempoB__ = Label(janela, text=Vetores[1].tempoExe)
+    labelTempoB__.pack()
+    labelTempoB__.place(x=50, y=550)
     
     menu_bt = Button(janela, text='Voltar/Menu Principal', command=tchauQuerida)
     menu_bt.pack()
     # Enquanto o vetor estiver desordenado, atualiza
     start = False
     while (Vetores[0].ordenado == False or Vetores[1].ordenado == False):
+        
+        labelTempoA_.configure(text=Vetores[0].tempoAni)
+        labelTempoA__.configure(text=Vetores[0].tempoExe)
+        labelTempoB_.configure(text=Vetores[1].tempoAni)
+        labelTempoB__.configure(text=Vetores[1].tempoExe)
         
         Figuras[0].clear()
         Figuras[0].add_subplot(111).plot(Vetores[0].lista)
@@ -428,22 +481,7 @@ def tela_simulacao():
             threadb = minhaThread(0, Vetores[1], AlgoritmoB, tempo)
             threadb.start()
             
-    # Exibe tempo de execução e animação
-    labelTempoA_ = Label(janela, text=Vetores[0].tempoAni)
-    labelTempoA_.pack()
-    labelTempoA_.place(x=50, y=150)
-    
-    labelTempoA__ = Label(janela, text=Vetores[0].tempoExe)
-    labelTempoA__.pack()
-    labelTempoA__.place(x=50, y=250)
-    
-    labelTempoB_ = Label(janela, text=Vetores[1].tempoAni)
-    labelTempoB_.pack()
-    labelTempoB_.place(x=50, y=450)
-    
-    labelTempoB__ = Label(janela, text=Vetores[1].tempoExe)
-    labelTempoB__.pack()
-    labelTempoB__.place(x=50, y=550)
+
     
     # Atualiza uma última vez
     time.sleep(1)        
@@ -457,6 +495,10 @@ def tela_simulacao():
     canvasB.draw()
     Figuras[1].canvas.flush_events()            
     
+    labelTempoA_.configure(text=Vetores[0].tempoAni)
+    labelTempoA__.configure(text=Vetores[0].tempoExe)
+    labelTempoB_.configure(text=Vetores[1].tempoAni)
+    labelTempoB__.configure(text=Vetores[1].tempoExe)
     
     # Indica que o processamento foi finalizado
     print("Processamento finalizado")
@@ -475,21 +517,45 @@ def menu():
     label3.place(x=160, y=325)
     # Botão de simulação
     menu_bt_simular = Button(janela, text='Simular', command=tela_simulacao)
-    menu_bt_simular.place(x=230, y=450)
+    menu_bt_simular.place(x=230, y=390)
     # Label de numero elementos
     labelIn = Label(janela, text='Insira o número de elementos')
     labelIn.place(x=170, y=50)
+    
     # Input de elementos
     global varN
     varN = StringVar()
-    inputN = Entry(janela, textvariable=varN, width=13)
+    inputN = Entry(janela, textvariable=varN, width=13, justify=CENTER)
     inputN.pack()
     varN.set(50)
     inputN.place(x=215,y=85)
     global teste 
     teste = App(janela)
-   
-    janela.geometry("500x500+250+50")
+    
+    def radCall():
+        radSel = radVar.get()
+        if radSel == 1:
+            print("selecionei 1")
+            global tempoDeExecucao
+            tempoDeExecucacao = 0
+        elif radSel == 2:
+            global tempoDeExecucao
+            tempoDeExecucacao = 0.2
+        elif radSel == 3:
+            global tempoDeExecucao
+            tempoDeExecucacao = 1
+
+    radVar = IntVar()
+    
+    rad1 = Radiobutton(janela, text='Tempo Real', variable=radVar, value=1, command=radCall)
+    rad2 = Radiobutton(janela, text='Atraso Curto', variable=radVar, value=2, command=radCall)
+    rad3 = Radiobutton(janela, text='Atraso Longo', variable=radVar, value=3, command=radCall)
+    rad1.place(x=130, y=355)
+    rad2.place(x=220, y=355)
+    rad3.place(x=310, y=355)
+    rad1.select()
+    
+    janela.geometry("500x435+250+50")
     janela.title("ANÁLISE E COMPLEXIDADE DE ALGORITMOS")
     janela.configure(background='black')
     janela.mainloop()
